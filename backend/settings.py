@@ -79,11 +79,13 @@ TEMPLATES = [
 # CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://frontend-3d-app-b7f096aeb92c.herokuapp.com/'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://frontend-3d-app-b7f096aeb92c.herokuapp.com/'
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
