@@ -33,7 +33,7 @@ class Profile(models.Model):
 class Models(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
-    model = models.FileField(upload_to='3d_models', null=True, blank=True)
+    model = models.FileField(upload_to='model', null=True, blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

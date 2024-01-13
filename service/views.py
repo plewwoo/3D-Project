@@ -287,7 +287,6 @@ class UploadFile(APIView):
 
         model_list = []
         model = Models.objects.filter(user=user_id).order_by('-id')
-        print(model)
 
         for m in model:
             model_list.append({
@@ -296,12 +295,7 @@ class UploadFile(APIView):
                 'url': m.model.url,
                 'updated': m.upload_date
             })
-        print(model_list)
-
         result['results'] = model_list
-
-        print(result)
-
         http_status = status.HTTP_200_OK
 
         return Response(result, status=http_status)
@@ -312,7 +306,7 @@ class UploadFile(APIView):
 
         data = {
             'user_id': request.data.get('user_id'),
-            'file': request.data.get('file'),
+            'file': request.FILES['file'],
             'file_name': request.data.get('file_name'),
         }
 
@@ -320,14 +314,12 @@ class UploadFile(APIView):
             models = Models()
             models.user = User.objects.get(id=data['user_id'])
             models.name = str(data['file_name']).split(".")[0]
-            fs = FileSystemStorage(location=os.path.join(MEDIA_ROOT, '3d/'))
-            filename = fs.save(f"{str(data['file_name']).split(".")[0]}_{datetime.today().strftime('%Y%m%d%H%M%S')}.{str(data['file_name']).split(".")[-1]}", data['file'])
-            models.model = f'3d/{filename}'
+            models.model = request.FILES['file']
             models.save()
 
             result['results'] = {
                 'name': str(data['file_name']).split(".")[0],
-                'url': f'/media/3d/{filename}',
+                'url': models.model.url,
                 'updated': models.upload_date
             }
 
