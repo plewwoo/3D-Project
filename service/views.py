@@ -318,6 +318,7 @@ class UploadFile(APIView):
             models.save()
 
             result['results'] = {
+                'id': models.id,
                 'name': str(data['file_name']).split(".")[0],
                 'url': models.model.url,
                 'updated': models.upload_date
