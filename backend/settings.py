@@ -80,12 +80,12 @@ TEMPLATES = [
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    'https://frontend-3d-app-b7f096aeb92c.herokuapp.com/'
+    'https://frontend-3d-app-b7f096aeb92c.herokuapp.com'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'https://frontend-3d-app-b7f096aeb92c.herokuapp.com/'
+    'https://frontend-3d-app-b7f096aeb92c.herokuapp.com'
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
@@ -106,7 +106,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = dj_database_url.config(default='postgres://yewsualxtwgwbv:892ca54ccbce0f92b51c10e8b19cdc2b7308bdb5a22c12ca36c0f23180f82ab1@ec2-44-206-204-65.compute-1.amazonaws.com:5432/dbi9lnsb9flifo')
+DATABASES['default'] = dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

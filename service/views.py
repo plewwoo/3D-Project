@@ -292,7 +292,7 @@ class UploadFile(APIView):
             model_list.append({
                 'id': m.id,
                 'name': m.name,
-                'url': m.model.url,
+                'url': f'{m.model.url}.{m.extension}',
                 'updated': m.upload_date
             })
         result['results'] = model_list
@@ -310,21 +310,29 @@ class UploadFile(APIView):
             'file_name': request.data.get('file_name'),
         }
 
+        http_status = status.HTTP_400_BAD_REQUEST
+
         try:
-            models = Models()
-            models.user = User.objects.get(id=data['user_id'])
-            models.name = str(data['file_name']).split(".")[0]
-            models.model = request.FILES['file']
-            models.save()
+            if str(data['file_name']).split(".")[1] == 'glb':
+                models = Models()
+                models.user = User.objects.get(id=data['user_id'])
+                models.name = str(data['file_name']).split(".")[0]
+                models.model = request.FILES['file']
+                models.extension = str(data['file_name']).split(".")[1]
+                models.save()
 
-            result['results'] = {
-                'id': models.id,
-                'name': str(data['file_name']).split(".")[0],
-                'url': models.model.url,
-                'updated': models.upload_date
-            }
+                result['results'] = {
+                    'id': models.id,
+                    'name': str(data['file_name']).split(".")[0],
+                    'url': f'{models.model.url}.{models.extension}',
+                    'updated': models.upload_date
+                }
+                result['message'] = 'Upload File Success !!'
 
-            http_status = status.HTTP_201_CREATED
+                http_status = status.HTTP_201_CREATED
+            else:
+                result['success'] = False
+                result['message'] = 'File must be .glb'
 
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
