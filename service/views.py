@@ -293,6 +293,7 @@ class UploadFile(APIView):
                 'id': m.id,
                 'name': m.name,
                 'url': f'{m.model.url}.{m.extension}',
+                'version': m.version,
                 'updated': m.upload_date
             })
         result['results'] = model_list
@@ -320,11 +321,18 @@ class UploadFile(APIView):
                 models.model = request.FILES['file']
                 models.extension = str(data['file_name']).split(".")[1]
                 models.save()
+                models.version = [{
+                    'version': 1,
+                    'model': models.model.url,
+                    'extension': str(data['file_name']).split(".")[1]
+                }]
+                models.save()
 
                 result['results'] = {
                     'id': models.id,
                     'name': str(data['file_name']).split(".")[0],
                     'url': f'{models.model.url}.{models.extension}',
+                    'version': models.version,
                     'updated': models.upload_date
                 }
                 result['message'] = 'Upload File Success !!'
@@ -343,5 +351,82 @@ class UploadFile(APIView):
             result['message'] = 'Login Failed'
             result['data'] = str(e)
             http_status = status.HTTP_400_BAD_REQUEST
+
+        return Response(result, status=http_status)
+
+    @staticmethod
+    def put(request, *args, **kwargs):
+        result = {'success': True, 'message': ''}
+
+        data = {
+            'model_id': request.data.get('id'),
+            'file': request.FILES['file'],
+            'file_name': request.data.get('file_name')
+        }
+
+        http_status = status.HTTP_400_BAD_REQUEST
+
+        try:
+            if str(data['file_name']).split(".")[1] == 'glb':
+                models = Models.objects.get(id=data['model_id'])
+                if models:
+                    models.name = str(data['file_name']).split(".")[0]
+                    models.model = request.FILES['file']
+                    models.extension = str(data['file_name']).split(".")[1]
+                    models.save()
+                    models.version = [{
+                        'version': int(models.version[0]['version']) + 1,
+                        'model': models.model.url,
+                        'extension': str(data['file_name']).split(".")[1]
+                    }, *models.version]
+                    models.save()
+                    http_status = status.HTTP_200_OK
+
+                    result['results'] = {
+                        'id': models.id,
+                        'name': str(data['file_name']).split(".")[0],
+                        'url': f'{models.model.url}.{models.extension}',
+                        'version': models.version,
+                        'updated': models.upload_date
+                    }
+                    result['message'] = 'Upload File Success !!'
+                else:
+                    result['success'] = False
+                    result['message'] = 'Model not found'
+            else:
+                result['success'] = False
+                result['message'] = 'File must be .glb'
+        
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+            print(e)
+            result['success'] = False
+            result['message'] = 'Login Failed'
+            result['data'] = str(e)
+            http_status = status.HTTP_400_BAD_REQUEST
+
+        return Response(result, status=http_status)
+
+class GetModel(APIView):
+
+    def get(request, *args, **kwargs):
+        result = {'success': True, 'message': ''}
+
+        id = kwargs.get('id', None)
+
+        model_dict = {}
+        model = Models.objects.get(id=id)
+
+        model_dict['id'] = model.id
+        model_dict['name'] = model.name
+        model_dict['url'] = f'{model.model.url}.{model.extension}'
+        model_dict['version'] = model.version
+        model_dict['updated'] = model.upload_date
+
+        print(model_dict)
+        result['results'] = model_dict
+        http_status = status.HTTP_200_OK
 
         return Response(result, status=http_status)

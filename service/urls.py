@@ -11,7 +11,8 @@ urlpatterns = [
     path('check-login/', CheckLogin.as_view(), name='auth-check-login'),
     path('profile/<int:id>/', UserProfile.as_view(), name='user'),
     path('models/<int:id>/', UploadFile.as_view(), name='models'),
-    path('upload/', UploadFile.as_view(), name='upload')
+    path('upload/', UploadFile.as_view(), name='upload'),
+    path('model/<int:id>', GetModel.as_view(), name='model')
     # path('login/', MyObtainTokenPairView.as_view(), name='auth-login'),
 ]
 
